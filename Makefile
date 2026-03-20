@@ -12,9 +12,21 @@ help:
 	@echo "  make example-karaoke - Run the play_karaoke example (in release mode)"
 	@echo "  make example-reverb  - Run the play_mic_reverb example (in release mode)"
 	@echo "  make example-dynamic - Run the play_dynamic_properties example (in release mode)"
+	@echo "  make publish         - Publish the crate to crates.io"
 
 build:
 	cargo build
+
+publish-test:
+	make release
+	cargo test --doc
+	cargo test
+	make clippy
+	make fmt
+	cargo publish --dry-run --allow-dirty
+
+publish:
+	cargo publish
 
 release:
 	cargo build --release
@@ -23,8 +35,8 @@ test:
 	cargo test
 
 doc:
-	cargo test --doc
-	cargo doc --open
+	cargo test --no-deps --doc
+	cargo doc --no-deps --open
 
 clippy:
 	cargo clippy --all-targets --all-features
