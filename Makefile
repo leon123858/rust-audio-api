@@ -35,7 +35,7 @@ test:
 	cargo test
 
 doc:
-	cargo test --no-deps --doc
+	cargo test --doc
 	cargo doc --no-deps --open
 
 clippy:
