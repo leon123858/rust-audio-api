@@ -98,6 +98,11 @@ You can run any of the examples using Cargo. For the best performance (to avoid 
 cargo run --release --example play_karaoke
 ```
 
+### 🎤 Demo Application
+
+You can check out a full demo application built with this library at:
+👉 [myKTV Demo](https://github.com/leon123858/myKTV/tree/main/my-ktv)
+
 ## 🤝 Contributing
 
 We welcome contributions of all kinds! Whether you are reporting a bug, suggesting a new feature, or submitting code, your help is vital to the growth of `rust-audio-api`.
