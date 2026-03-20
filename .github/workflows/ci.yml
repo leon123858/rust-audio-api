@@ -1,6 +1,5 @@
 name: CI
 
-# 觸發條件：推送到 main 分支，或是任何針對 main 的 Pull Request
 on:
   push:
     branches: [ "main" ]
@@ -13,7 +12,6 @@ env:
 jobs:
   test:
     name: Test on ${{ matrix.os }}
-    # 使用矩陣策略，同時在 Ubuntu, macOS 和 Windows 上進行測試
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -28,12 +26,10 @@ jobs:
         with:
           components: rustfmt, clippy
 
-      # 針對音訊專案的特殊設定：Linux 需要 ALSA 開發套件才能編譯音訊底層庫 (如 cpal)
       - name: Install Linux system dependencies (ALSA, D-Bus)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libasound2-dev libdbus-1-dev pkg-config
 
-      # 加入快取機制，大幅加快後續的編譯速度
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
@@ -41,9 +37,10 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: Run Clippy (Linting)
-        # 這裡將 warning 視為 error，確保開源程式碼品質
         run: cargo clippy --all-targets --all-features -- -D warnings
 
+      - name: Check compilation
+        run: cargo check --all-targets --all-features
+
       - name: Run tests
-        # 執行所有測試
         run: cargo test --all-features --verbose
