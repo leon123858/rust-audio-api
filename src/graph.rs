@@ -320,23 +320,24 @@ impl StaticGraph {
         match msg {
             ControlMessage::SetParameter(node_id, parameter) => {
                 if let Some(&index) = self.id_to_index.get(&node_id)
-                    && let Some(node) = self.nodes.get_mut(index) {
-                        // Enum dispatching (static dispatch)
-                        match (node, parameter) {
-                            (NodeType::Gain(g), NodeParameter::Gain(val)) => g.set_gain(val),
-                            (NodeType::Oscillator(o), NodeParameter::Gain(val)) => o.set_gain(val),
-                            (NodeType::Mixer(m), NodeParameter::Gain(val)) => m.set_gain(val),
-                            (NodeType::Delay(d), NodeParameter::DelayUnits(val)) => {
-                                d.set_delay_units(val)
-                            }
-                            (NodeType::Filter(f), NodeParameter::Cutoff(val)) => f.set_cutoff(val),
-                            (NodeType::Filter(f), NodeParameter::Q(val)) => f.set_q(val),
-                            // Dynamic updates for Convolver are not supported (requires IR FFT recalculation)
-                            // Implement other property updates here if expanded later
-                            // (NodeType::Oscillator(o), NodeParameter::Frequency(val)) => o.set_frequency(val),
-                            _ => {}
+                    && let Some(node) = self.nodes.get_mut(index)
+                {
+                    // Enum dispatching (static dispatch)
+                    match (node, parameter) {
+                        (NodeType::Gain(g), NodeParameter::Gain(val)) => g.set_gain(val),
+                        (NodeType::Oscillator(o), NodeParameter::Gain(val)) => o.set_gain(val),
+                        (NodeType::Mixer(m), NodeParameter::Gain(val)) => m.set_gain(val),
+                        (NodeType::Delay(d), NodeParameter::DelayUnits(val)) => {
+                            d.set_delay_units(val)
                         }
+                        (NodeType::Filter(f), NodeParameter::Cutoff(val)) => f.set_cutoff(val),
+                        (NodeType::Filter(f), NodeParameter::Q(val)) => f.set_q(val),
+                        // Dynamic updates for Convolver are not supported (requires IR FFT recalculation)
+                        // Implement other property updates here if expanded later
+                        // (NodeType::Oscillator(o), NodeParameter::Frequency(val)) => o.set_frequency(val),
+                        _ => {}
                     }
+                }
             }
         }
     }

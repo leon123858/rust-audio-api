@@ -5,6 +5,7 @@ help:
 	@echo "  make build           - Build the project (debug)"
 	@echo "  make release         - Build the project (release)"
 	@echo "  make test            - Run all unit and doc tests"
+	@echo "  make doc             - Build documentation
 	@echo "  make clippy          - Run Rust clippy linter"
 	@echo "  make fmt             - Format cargo code"
 	@echo "  make clean           - Clean build artifacts"
@@ -21,8 +22,9 @@ release:
 test:
 	cargo test
 
-test-doc:
+doc:
 	cargo test --doc
+	cargo doc --open
 
 clippy:
 	cargo clippy --all-targets --all-features

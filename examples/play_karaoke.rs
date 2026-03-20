@@ -143,7 +143,7 @@ fn main() {
         let ir_path = "examples/resource/plate01.wav";
         let max_reverb_len = Some((sample_rate as f32 * 1.2) as usize); // Limit length to 1.2 seconds
         let config = rust_audio_api::nodes::ConvolverConfig::default();
-        
+
         let convolver_node =
             ConvolverNode::from_file_with_config(ir_path, sample_rate, max_reverb_len, config)
                 .expect("Unable to construct ConvolverNode");

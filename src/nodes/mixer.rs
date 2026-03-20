@@ -43,12 +43,18 @@ impl Default for MixerNode {
 impl MixerNode {
     /// Creates a new `MixerNode` with unity gain (1.0) and clipping enabled.
     pub fn new() -> Self {
-        Self { gain: 1.0, clipping: true }
+        Self {
+            gain: 1.0,
+            clipping: true,
+        }
     }
 
     /// Creates a new `MixerNode` with the specified gain factor and clipping enabled by default.
     pub fn with_gain(gain: f32) -> Self {
-        Self { gain, clipping: true }
+        Self {
+            gain,
+            clipping: true,
+        }
     }
 
     /// Sets the gain factor for the mixed output.
@@ -74,10 +80,7 @@ impl MixerNode {
             } else {
                 // Apply gain only
                 dasp::slice::map_in_place(&mut output[..], |frame| {
-                    [
-                        frame[0] * self.gain,
-                        frame[1] * self.gain,
-                    ]
+                    [frame[0] * self.gain, frame[1] * self.gain]
                 });
             }
         } else {
