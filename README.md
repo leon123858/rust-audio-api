@@ -8,7 +8,7 @@ To meet the rigorous demands of real-time audio processing, this project strictl
 
 1. **Maximum Performance & Low Latency**
    - Utilizes a **Pull-Mode** topology design, where the audio output device actively pulls data from the graph.
-   - The underlying hardware interaction relies on **`cpal` (Cross-Platform Audio Library)** to directly interface with native OS audio APIs (WASAPI, ALSA, CoreAudio), leveraging high-priority audio threads (`audio_thread_priority`) to ensure minimal latency.
+   - The underlying hardware interaction relies on **`cpal` (Cross-Platform Audio Library)** to directly interface with native OS audio APIs, leveraging high-priority audio threads (`audio_thread_priority`) to ensure minimal latency.
    - The core Audio Render Thread works closely with `cpal`'s hardware callbacks, avoiding any unnecessary intermediate execution overhead.
    - Integrates `dasp` internally for high-quality, high-performance real-time resampling and channel conversion.
 
@@ -50,4 +50,34 @@ You can run any of the examples using Cargo. For the best performance (to avoid 
 
 ```bash
 cargo run --release --example play_karaoke
+```
+
+## 🤝 Contributing
+
+We welcome contributions of all kinds! Whether you are reporting a bug, suggesting a new feature, or submitting code, your help is vital to the growth of `rust-audio-api`.
+
+### 💡 Reporting Issues & Feature Requests
+If you encounter any problems or wish to see new **AudioNodes**, **DSP algorithms**, or other features, please open an **Issue** on GitHub. We provide specific Issue templates to help you include all necessary information. We encourage discussing major changes in an Issue before starting the implementation.
+
+### 🛠️ Pull Requests (PRs)
+If you would like to contribute code directly (e.g., fixing a bug or implementing a new feature), please follow these steps:
+
+1.  **Clone & Branch:** Clone the repository locally and create a descriptive branch from `main` (e.g., `feature/biquad-filter` or `bugfix/buffer-underflow`).
+2.  **Development & Testing:** * Ensure code style consistency by running `cargo fmt`.
+    * Check for common mistakes using `cargo clippy`.
+    * **Audio Logic:** Since the project relies on `cpal` and `dasp`, please write tests using in-memory buffers whenever possible. Avoid tests that require physical audio hardware to ensure the CI pipeline runs smoothly.
+3.  **Submit PR:** Once your changes are ready, open a Pull Request to the `main` branch. Be sure to link the relevant Issue in your description to provide context for the maintainers.
+
+### 📝 Commit Message Guidelines
+
+**Format:**
+
+```
+[FIX] <simple description>
+
+[FEATURE] <simple description>
+
+[CONFIG] <simple description>
+
+[INVALID] <simple description>
 ```

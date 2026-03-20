@@ -14,8 +14,8 @@ fn test_lowpass_passes_dc() {
     // DC 信號（常數值）應該能完全通過低通濾波器
     let mut filter = FilterNode::new(FilterType::LowPass, 48000, 1000.0, 0.707);
     let mut input = empty_audio_unit();
-    for i in 0..AUDIO_UNIT_SIZE {
-        input[i] = [0.5, 0.5];
+    for item in input.iter_mut().take(AUDIO_UNIT_SIZE) {
+        *item = [0.5, 0.5];
     }
 
     // 多跑幾輪讓濾波器穩態收斂
@@ -43,8 +43,8 @@ fn test_highpass_rejects_dc() {
     // DC 信號應該被高通濾波器完全濾掉（衰減到接近 0）
     let mut filter = FilterNode::new(FilterType::HighPass, 48000, 1000.0, 0.707);
     let mut input = empty_audio_unit();
-    for i in 0..AUDIO_UNIT_SIZE {
-        input[i] = [0.5, 0.5];
+    for item in input.iter_mut().take(AUDIO_UNIT_SIZE) {
+        *item = [0.5, 0.5];
     }
 
     // 多跑幾輪讓濾波器穩態收斂
@@ -73,8 +73,8 @@ fn test_filter_no_input_outputs_silence() {
     let mut output = empty_audio_unit();
 
     // 先把 output 填上非零值，確認 process(None) 會清零
-    for i in 0..AUDIO_UNIT_SIZE {
-        output[i] = [1.0, 1.0];
+    for item in output.iter_mut().take(AUDIO_UNIT_SIZE) {
+        *item = [1.0, 1.0];
     }
 
     filter.process(None, &mut output);

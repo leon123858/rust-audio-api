@@ -80,8 +80,8 @@ fn test_mixer_node_process_without_input_outputs_silence() {
     let mut mixer_node = MixerNode::new();
     let mut output = empty_audio_unit();
 
-    for i in 0..AUDIO_UNIT_SIZE {
-        output[i] = [1.0, 1.0];
+    for item in output.iter_mut().take(AUDIO_UNIT_SIZE) {
+        *item = [1.0, 1.0];
     }
 
     mixer_node.process(None, &mut output);

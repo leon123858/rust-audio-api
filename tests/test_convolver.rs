@@ -43,9 +43,9 @@ fn test_convolver_delayed_impulse() {
     assert!((output[15][0] - 1.0).abs() < 1e-5);
     assert!((output[15][1] - 0.2).abs() < 1e-5);
 
-    for i in 0..AUDIO_UNIT_SIZE {
+    for (i, item) in output.iter().enumerate().take(AUDIO_UNIT_SIZE) {
         if i != 5 && i != 15 {
-            assert!((output[i][0]).abs() < 1e-5);
+            assert!((item[0]).abs() < 1e-5);
         }
     }
 
@@ -59,9 +59,9 @@ fn test_convolver_delayed_impulse() {
     assert!((output2[4][0] - 0.1).abs() < 1e-5);
     assert!((output2[4][1] - 0.1).abs() < 1e-5);
 
-    for i in 0..AUDIO_UNIT_SIZE {
+    for (i, item) in output2.iter().enumerate().take(AUDIO_UNIT_SIZE) {
         if i != 4 {
-            assert!((output2[i][0]).abs() < 1e-5);
+            assert!((item[0]).abs() < 1e-5);
         }
     }
 }
