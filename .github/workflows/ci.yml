@@ -29,9 +29,9 @@ jobs:
           components: rustfmt, clippy
 
       # 針對音訊專案的特殊設定：Linux 需要 ALSA 開發套件才能編譯音訊底層庫 (如 cpal)
-      - name: Install ALSA dependencies (Linux only)
+      - name: Install Linux system dependencies (ALSA, D-Bus)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libasound2-dev
+        run: sudo apt-get update && sudo apt-get install -y libasound2-dev libdbus-1-dev pkg-config
 
       # 加入快取機制，大幅加快後續的編譯速度
       - name: Rust Cache
