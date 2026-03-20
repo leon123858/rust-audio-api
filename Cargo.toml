@@ -9,7 +9,7 @@ repository = "https://github.com/leon123858/rust-audio-api"
 documentation = "https://docs.rs/rust-audio-api"
 readme = "README.md"
 keywords = ["audio", "wrapper"]
-categories = ["audio"]
+categories = ["multimedia::audio"]
 exclude = [
     "target/",
     ".git/",
