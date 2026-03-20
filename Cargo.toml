@@ -10,6 +10,15 @@ documentation = "https://docs.rs/rust-audio-api"
 readme = "README.md"
 keywords = ["audio", "wrapper"]
 categories = ["audio"]
+exclude = [
+    "target/",
+    ".git/",
+    ".idea/",
+    ".github/",
+    "examples/",
+    "tests/",
+    "Makefile",
+]
 
 [dependencies]
 thread-priority = "1.1.0"
