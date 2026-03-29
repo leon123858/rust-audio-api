@@ -70,6 +70,7 @@ impl Default for PerformanceMonitor {
 /// ```
 pub struct AudioContext {
     stream: Option<Stream>,
+    device: cpal::Device,
     sample_rate: u32,
     msg_sender: Sender<ControlMessage>,
     graph_builder: Option<GraphBuilder>,
@@ -77,12 +78,89 @@ pub struct AudioContext {
 }
 
 impl AudioContext {
+    /// Lists all available output audio devices.
+    ///
+    /// Returns a list of `(name, device)` tuples. On Windows, a Bluetooth device
+    /// typically appears as two separate endpoints:
+    /// - `"Speakers (Device)"` — A2DP music mode (high quality, high latency)
+    /// - `"Headset (Device)"` — HFP communication mode (lower quality, low latency)
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use rust_audio_api::AudioContext;
+    ///
+    /// let devices = AudioContext::available_output_devices().unwrap();
+    /// for (name, _device) in &devices {
+    ///     println!("  {}", name);
+    /// }
+    /// ```
+    pub fn available_output_devices() -> Result<Vec<(String, cpal::Device)>, anyhow::Error> {
+        let host = cpal::default_host();
+        let devices = host
+            .output_devices()
+            .map_err(|e| anyhow::anyhow!("Failed to enumerate output devices: {}", e))?;
+        let mut result = Vec::new();
+        for device in devices {
+            let label = match device.description() {
+                Ok(desc) => format!("{}", desc),
+                Err(_) => "Unknown Device".to_string(),
+            };
+            result.push((label, device));
+        }
+        Ok(result)
+    }
+
+    /// Creates a new `AudioContext` with a specific output device.
+    ///
+    /// Use [`AudioContext::available_output_devices`] to obtain a device,
+    /// then pass it here. This is useful for selecting a Bluetooth HFP
+    /// (Hands-Free Profile) endpoint for low-latency real-time audio.
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use rust_audio_api::AudioContext;
+    ///
+    /// let devices = AudioContext::available_output_devices().unwrap();
+    /// let (_name, device) = devices.into_iter().next().unwrap();
+    /// let ctx = AudioContext::new_with_device(device).unwrap();
+    /// ```
+    pub fn new_with_device(device: cpal::Device) -> Result<Self, anyhow::Error> {
+        Self::from_device(device)
+    }
+
+    /// Creates a new `AudioContext` by matching device name (case-insensitive substring).
+    ///
+    /// Searches all available output devices for one whose name contains `name`.
+    /// This is convenient for selecting a Bluetooth HFP endpoint by its label
+    /// (e.g. `"Headset"`).
+    ///
+    /// # Examples
+    /// ```no_run
+    /// use rust_audio_api::AudioContext;
+    ///
+    /// // Select the Bluetooth Hands-Free (communication) endpoint
+    /// let ctx = AudioContext::new_with_device_name("Headset").unwrap();
+    /// ```
+    pub fn new_with_device_name(name: &str) -> Result<Self, anyhow::Error> {
+        let devices = Self::available_output_devices()?;
+        let needle = name.to_lowercase();
+        let (_matched_name, device) = devices
+            .into_iter()
+            .find(|(dev_name, _)| dev_name.to_lowercase().contains(&needle))
+            .ok_or_else(|| anyhow::anyhow!("No output device found matching '{}'", name))?;
+        Self::from_device(device)
+    }
+
     /// Creates a new `AudioContext` with the default output device and sample rate.
     pub fn new() -> Result<Self, anyhow::Error> {
         let host = cpal::default_host();
         let device = host
             .default_output_device()
             .expect("Default output device not found");
+        Self::from_device(device)
+    }
+
+    fn from_device(device: cpal::Device) -> Result<Self, anyhow::Error> {
         let supported_config = device.default_output_config()?;
         let sample_rate = supported_config.sample_rate();
 
@@ -90,6 +168,7 @@ impl AudioContext {
 
         Ok(Self {
             stream: None,
+            device,
             sample_rate,
             msg_sender: tx,
             graph_builder: Some(GraphBuilder::new()),
@@ -133,9 +212,7 @@ impl AudioContext {
             return Ok(());
         }
 
-        let host = cpal::default_host();
-        let device = host.default_output_device().unwrap();
-        let supported_config = device.default_output_config()?;
+        let supported_config = self.device.default_output_config()?;
         let sample_format = supported_config.sample_format();
         let config: StreamConfig = supported_config.into();
 
@@ -147,9 +224,9 @@ impl AudioContext {
         let static_graph = builder.build(destination_id, rx);
 
         let stream = match sample_format {
-            SampleFormat::F32 => self.build_stream::<f32>(&device, &config, static_graph)?,
-            SampleFormat::I16 => self.build_stream::<i16>(&device, &config, static_graph)?,
-            SampleFormat::U16 => self.build_stream::<u16>(&device, &config, static_graph)?,
+            SampleFormat::F32 => self.build_stream::<f32>(&self.device, &config, static_graph)?,
+            SampleFormat::I16 => self.build_stream::<i16>(&self.device, &config, static_graph)?,
+            SampleFormat::U16 => self.build_stream::<u16>(&self.device, &config, static_graph)?,
             _ => return Err(anyhow::anyhow!("Unsupported audio output device format")),
         };
 
